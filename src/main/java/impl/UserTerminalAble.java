@@ -1,11 +1,12 @@
 package impl;
 
+import java.math.BigDecimal;
+
 public interface UserTerminalAble {
     void start();
-    void balance();
-    void authorization();
-    void putMoney();
-    void getMoney();
+    boolean authorization(String userName, String userPassword) throws Throwable;
+    void putMoney(String userName, String userPassword, BigDecimal summ)throws Throwable;
+    void getMoney(String userName, String userPassword, BigDecimal summ)throws Throwable;
     void stop();
-    void logout();
+    BigDecimal getBalance(String userName, String userPassword) throws Throwable;
 }

@@ -5,102 +5,53 @@ import impl.SumValidatorAble;
 import impl.UserTerminalAble;
 
 import java.math.BigDecimal;
-import java.text.MessageFormat;
-import java.util.Scanner;
 
 public class UserTerminal implements UserTerminalAble {
 
     private ServerAble server = null;
     private String userName;
     private String userPassword;
-    private boolean validate = false;
-    Scanner in;
 
     private SumValidatorAble sumValidator;
 
     public void start() {
         server = Server.getServer();
         System.out.println("start(" + server + ")");
-        in = new Scanner(System.in);
-
         sumValidator = new SumValidator();
     }
+    public boolean authorization(String userName, String userPassword) throws Throwable {
 
-    public void balance() {
-        BigDecimal summ = server.getBalance(userName, userPassword);
-        System.out.println("Ваш баланс:" + summ);
+      return server.authorization(userName, userPassword);
+
     }
 
-    public void authorization() {
+    public void putMoney(String userName, String userPassword, BigDecimal summ) throws Throwable {
 
-        System.out.println("Авторизация!");
-        System.out.print("Введите логин: ");
-        userName = in.nextLine();
-
-        System.out.print("Введите пароль: ");
-        userPassword = in.nextLine();
-        System.out.println("Добро пожаловать " + userName);
-        validate = true;
-    }
-
-    public void putMoney() {
-
-        System.out.println("Внесение суммы!");
-        System.out.print("Введите сумму: ");
-
-        BigDecimal summ = in.nextBigDecimal();
-
-        try {
-            sumValidator.validateSummForTerminal(summ);
-        }
-        catch (IllegalArgumentException e) {
-            putMoney();
-            return;
-        }
-        catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
+        String validateSumm = sumValidator.validateSummForTerminal(summ);
+        if (!validateSumm.equals("")){
+            throw new IllegalArgumentException(validateSumm);
+        };
 
         server.putMoney(userName, userPassword, summ);
-
     }
 
-    public void getMoney() {
+    public void getMoney(String userName, String userPassword, BigDecimal summ) throws Throwable{
 
-        System.out.println("Получение суммы!");
-        System.out.print("Введите сумму: ");
-        BigDecimal summ = in.nextBigDecimal();
+        String validateSumm = sumValidator.validateSummForTerminal(summ);
 
-        try {
-            sumValidator.validateSummForTerminal(summ);
-        }
-        catch (IllegalArgumentException e) {
-            getMoney();
-            return;
-        }
-        catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
+        if (!validateSumm.equals("")){
+            throw new IllegalArgumentException(validateSumm);
+        };
+
         server.getMoney(userName, userPassword, summ);
-
     }
 
     public void stop() {
-        logout();
         System.out.println("stop(" + server + ")");
         server = null;
-
-        in.close();
     }
 
-    public void logout() {
-
-        if (validate){
-            System.out.printf("До свидания: %s!%n", userName);
-        }
-        userName = null;
-        userPassword=null;
-        validate = false;
+    public BigDecimal getBalance(String userName, String userPassword) throws Throwable{
+        return server.getBalance(userName, userPassword);
     }
-
 }
